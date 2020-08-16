@@ -1,0 +1,145 @@
+---
+title: "Data Science Lab Project"
+output:
+  html_document:
+    df_print: paged
+autors: Daniele & Maddalina
+---
+
+**Preprocessing**
+
+- Eliminazione variabili na
+- Eliminazione variabili correlate
+- Feature Selection
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+library(rlist)
+library(dplyr)
+library(tidyr)
+library(pander)
+library(corrplot)
+library(RColorBrewer)
+library(caret)
+library(reshape2)
+library(ggplot2)
+
+
+```
+
+Caricamento dataframe
+
+```{r}
+df <- read.csv("DatasetClientClustering.csv")
+```
+
+Colonne dataframe
+
+```{r}
+colnames(df)
+```
+
+Numero osservazioni nel dataset
+
+```{r}
+nrow(df)
+```
+
+Controllo valori NA per ogni colonna del dataframe
+
+```{r}
+pander(colSums(is.na(df)))
+```
+
+Rimozione attributi na
+
+```{r}
+df <- df[, -c(3:8)]
+
+df
+```
+
+Verifico il tipo di attibuti
+```{r}
+str(df)
+
+```
+Elimino colonne non rilevanti
+
+```{r}
+
+df <- df[, -c(1,2)]
+
+str(df)
+
+
+```
+
+
+Seleziono le variabili numeriche
+
+```{r}
+VAR_NUMERIC <- select_if(df, is.numeric)
+
+colnames(VAR_NUMERIC)
+```
+
+Matrice di correlazione 
+
+```{r}
+
+M <-cor(VAR_NUMERIC)
+
+corrplot(M, method = "color", type = "lower", order = "hclust", tl.col = "black", tl.cex = 0.5, )
+
+```
+
+ELIMINAZIONE ATTRIBUTI CORRELATI (ATTUALMENTE NON ESEGUITO A CAUSA DELLA PERDITA DI INFORMAZIONI IMPORTANTI)
+
+```{r}
+
+'df2 = cor(VAR_NUMERIC)
+hc = findCorrelation(df2, cutoff=0.9) # putt any value as a "cutoff" 
+hc = sort(hc)
+reduced_Data = df[,-c(hc)]
+
+VAR_NUMERIC_2 <- select_if(reduced_Data, is.numeric)
+M <-cor(VAR_NUMERIC_2)
+
+corrplot(M, method = "color", type = "lower", order = "hclust", tl.col = "black", tl.cex = 0.5, )'
+
+```
+
+
+```{r}
+'df <- VAR_NUMERIC_2
+nrow(df)
+colnames(df)'
+
+```
+
+
+
+
+Eliminio le osservazioni anomale, ossia le osservazioni per cui la somma degli attributi è minore di 1
+
+```{r}
+df$sum<- df$OtherInvestments + df$BondInvestments + df$MoneyMarketInvestments + df$Cash + df$EquityInvestments 
+df <- df[!(df$sum < 0.98),] #rimuoviamo osservazioni anomale
+
+df <- df[,-23] #remove sum
+
+```
+
+Correlazione
+
+
+
+
+
